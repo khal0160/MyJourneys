@@ -1,12 +1,46 @@
-import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View, Button } from 'react-native'
+
 import MapView from "react-native-maps";
-import { Stopwatch, Timer } from 'react-native-stopwatch-timer'
+import React, { useState, useEffect } from 'react';
+import { Platform, Text, View, StyleSheet, Button } from 'react-native';
+import Constants from 'expo-constants';
+import * as Location from 'expo-location';
 
 export default function Journey ({ navigation, route }) {
-  console.log(navigation)
-  console.log(route)
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [sessionStarted, setSessionStarted] = useState(false)
+
+    useEffect(() => {
+        (async () => {
+          if (Platform.OS === 'android' && !Constants.isDevice) {
+            setErrorMsg(
+              'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+            );
+            return;
+          }
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+          }
+    
+          let location = await Location.getCurrentPositionAsync({});
+          setLocation(location);
+          console.log(location)
+          
+        })();
+      }, []);
+    
+      let text = 'Waiting..';
+      if (errorMsg) {
+        text = errorMsg;
+      } else if (location) {
+        text = JSON.stringify(location);
+      }
+      function startSession() {
+          setSessionStarted(!sessionStarted)
+      }
   return (
     <View style={styles.container}>
       
@@ -20,8 +54,9 @@ export default function Journey ({ navigation, route }) {
           longitudeDelta: 0.0421,
         }}
       />
+      <Text style={styles.paragraph}>{text}</Text>
       <Text style={styles.title}>00:00:00</Text>
-      <Button title='Start' />
+      <Button title={ sessionStarted? 'Stop' : 'Start' } onPress={() => startSession()}/>
       <StatusBar style='auto' />
     </View>
   )
@@ -44,4 +79,8 @@ const styles = StyleSheet.create({
     width: 350,
     height: 350
   },
+  paragraph: {
+    fontSize: 18,
+    textAlign: 'center',
+  }
 })
