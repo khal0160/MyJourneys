@@ -20,13 +20,13 @@ export default function App() {
         <Stack.Screen name="Dashboard" component={Dashboard} 
         options={{
           ...headerOpts,
-          title: 'Welcome to the App'
+          title: 'Dashboard'
         }}
         />
         <Stack.Screen name="Journey" component={Journey} 
         options={{
           ...headerOpts,
-          title: 'Welcome to the App'
+          title: 'Journey'
         }}
         />
       </Stack.Navigator>

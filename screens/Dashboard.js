@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar'
 import React, { useState, useEffect } from 'react'
+import { FAB } from 'react-native-elements'
 import {
   StyleSheet,
   Text,
@@ -7,7 +8,6 @@ import {
   SafeAreaView,
   FlatList,
   Button
-
 } from 'react-native'
 
 export default function Dashboard ({ navigation, route }) {
@@ -30,12 +30,25 @@ export default function Dashboard ({ navigation, route }) {
   }, [])
   return (
     <SafeAreaView style={styles.container} edges={['right', 'bottom', 'left']}>
-      <Button title="Go to JourneyScreen" onPress={()=>{
-                navigation.navigate('Journey', {timmy: Date.now()})
-            }}></Button>
+      <FAB
+        visible={true}
+        icon={{ name: 'add', color: 'black' }}
+        onPress={() => {
+          navigation.navigate('Journey', { timmy: Date.now() })
+        }}
+        style={styles.fab}
+      />
+
       <FlatList
         data={characters}
-        renderItem={item => <Character character={item} />}
+        renderItem={item => (
+          <Character
+            character={item}
+            onPress={() => {
+              this.props.navigation.navigate('Journey', { timmy: Date.now() })
+            }}
+          />
+        )}
       />
       <StatusBar style='auto' />
     </SafeAreaView>
@@ -61,5 +74,10 @@ const styles = StyleSheet.create({
   },
   row: {
     margin: '10%'
+  },
+  fab: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    padding: '3%'
   }
 })
