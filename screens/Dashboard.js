@@ -7,7 +7,7 @@ import {
   View,
   SafeAreaView,
   FlatList,
-  TouchableWithoutFeedback
+  Pressable
 } from 'react-native'
 
 export default function Dashboard ({ navigation, route }) {
@@ -28,34 +28,36 @@ export default function Dashboard ({ navigation, route }) {
       })
       .catch(console.error)
   }, [])
-  function goToJourney(){
+  function goToJourney () {
     navigation.navigate('Journey')
   }
   function Character ({ character }) {
     //props.character
     //props.character.item  props.character.index
     return (
-      <TouchableWithoutFeedback 
-      style={styles.row}
-      onPress={() => {
-        goToJourney()
-      }}
+      <View
+        style={styles.row}
+        onPress={() => {
+          goToJourney()
+        }}
       >
         <Text>{character.item.name}</Text>
-      </TouchableWithoutFeedback>
+      </View>
     )
   }
   return (
     <SafeAreaView style={styles.container} edges={['right', 'bottom', 'left']}>
-      
-
       <FlatList
         data={characters}
         renderItem={item => (
-          <Character
-            character={item}
-            
-          />
+          <Pressable
+            style={styles.row}
+            onPress={() => {
+              goToJourney()
+            }}
+          >
+            <Character character={item} />
+          </Pressable>
         )}
       />
       <FAB
@@ -70,7 +72,6 @@ export default function Dashboard ({ navigation, route }) {
     </SafeAreaView>
   )
 }
-
 
 const styles = StyleSheet.create({
   container: {
