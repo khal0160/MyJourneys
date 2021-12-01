@@ -9,8 +9,8 @@ import Journey from './screens/Journey';
 
 const Stack = createStackNavigator();
 const headerOpts = {
-  headerStyle: { backgroundColor: 'grey' },
-  headerTintColor: 'white'
+  headerStyle: { backgroundColor: 'white' },
+  headerTintColor: 'black'
 }
 export default function App() {
   

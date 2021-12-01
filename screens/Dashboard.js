@@ -7,7 +7,7 @@ import {
   View,
   SafeAreaView,
   FlatList,
-  Button
+  TouchableWithoutFeedback
 } from 'react-native'
 
 export default function Dashboard ({ navigation, route }) {
@@ -28,41 +28,49 @@ export default function Dashboard ({ navigation, route }) {
       })
       .catch(console.error)
   }, [])
+  function goToJourney(){
+    navigation.navigate('Journey')
+  }
+  function Character ({ character }) {
+    //props.character
+    //props.character.item  props.character.index
+    return (
+      <TouchableWithoutFeedback 
+      style={styles.row}
+      onPress={() => {
+        goToJourney()
+      }}
+      >
+        <Text>{character.item.name}</Text>
+      </TouchableWithoutFeedback>
+    )
+  }
   return (
     <SafeAreaView style={styles.container} edges={['right', 'bottom', 'left']}>
-      <FAB
-        visible={true}
-        icon={{ name: 'add', color: 'black' }}
-        onPress={() => {
-          navigation.navigate('Journey', { timmy: Date.now() })
-        }}
-        style={styles.fab}
-      />
+      
 
       <FlatList
         data={characters}
         renderItem={item => (
           <Character
             character={item}
-            onPress={() => {
-              this.props.navigation.navigate('Journey', { timmy: Date.now() })
-            }}
+            
           />
         )}
+      />
+      <FAB
+        visible={true}
+        icon={{ name: 'add', color: 'white' }}
+        onPress={() => {
+          goToJourney()
+        }}
+        style={styles.fab}
       />
       <StatusBar style='auto' />
     </SafeAreaView>
   )
 }
-function Character ({ character }) {
-  //props.character
-  //props.character.item  props.character.index
-  return (
-    <View style={styles.row}>
-      <Text>{character.item.name}</Text>
-    </View>
-  )
-}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -73,11 +81,17 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   row: {
-    margin: '10%'
+    margin: 20,
+    backgroundColor: 'beige',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 300
   },
   fab: {
     width: '100%',
     justifyContent: 'flex-end',
-    padding: '3%'
+    paddingHorizontal: '9%',
+    paddingTop: '3%'
   }
 })
