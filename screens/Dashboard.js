@@ -10,26 +10,28 @@ import {
   Pressable
 } from 'react-native'
 
+
 export default function Dashboard ({ navigation, route }) {
   const baseURL = 'https://www.breakingbadapi.com/api/'
   const [characters, setCharacters] = useState([])
 
-  useEffect(() => {
-    fetch(`${baseURL}characters`)
-      .then(resp => {
-        if (!resp.ok) throw new Error(resp.statusText)
-        return resp.json()
-      })
-      .then(data => {
-        let results = data.map((item, index) => {
-          return { ...item, key: index + 7 }
-        })
-        setCharacters(results)
-      })
-      .catch(console.error)
-  }, [])
-  function goToJourney () {
-    navigation.navigate('Journey')
+  // useEffect(() => {
+  //   fetch(`${baseURL}characters`)
+  //     .then(resp => {
+  //       if (!resp.ok) throw new Error(resp.statusText)
+  //       return resp.json()
+  //     })
+  //     .then(data => {
+  //       let results = data.map((item, index) => {
+  //         return { ...item, key: index + 7 }
+  //       })
+  //       setCharacters(results)
+  //     })
+  //     .catch(console.error)
+  // }, [])
+  function goToJourney (obj) {
+    console.log(obj)
+    navigation.navigate('Journey',{journey: {obj}})
   }
   function Character ({ character }) {
     //props.character
@@ -38,7 +40,7 @@ export default function Dashboard ({ navigation, route }) {
       <View
         style={styles.row}
         onPress={() => {
-          goToJourney()
+          goToJourney( props.character)
         }}
       >
         <Text>{character.item.name}</Text>
@@ -53,7 +55,7 @@ export default function Dashboard ({ navigation, route }) {
           <Pressable
             style={styles.row}
             onPress={() => {
-              goToJourney()
+              goToJourney(item)
             }}
           >
             <Character character={item} />
