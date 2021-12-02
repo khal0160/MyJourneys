@@ -8,7 +8,6 @@ import { Platform, Text, View, StyleSheet, Button } from "react-native";
 import Constants from "expo-constants";
 
 import * as Location from "expo-location";
-
 import StopwatchContainer from '../components/StopwatchContainer'
 
 export default function Journey({ navigation, route }) {
@@ -58,8 +57,31 @@ export default function Journey({ navigation, route }) {
 	} else if (location) {
 		text = JSON.stringify(location);
 	}
-	function startSession() {
+	function startSession(obj) {
 		setSessionStarted(!sessionStarted);
+		// Replace Session component with StartedSession component
+		// If obj is empty , create one
+		// Session Object { path : [ interval 1, interval2]}
+		// interval i : { currentTime : {}, currentLat, currentLon}
+		// Start Timer in StopWatchContainer
+		// Every 3 seconds :
+		// Create an interval object
+		// Grab current time from StopWatchContainer
+		// Grab lat and lon from user location
+		// Update Object with grabbed info
+		// push the object into the path array
+		// Object.path.push(interval)
+	}
+	function stopSession(obj) {
+		// Break the 3 second loop in obj
+		// Replace StartedSession component with StoppedSession component
+
+	}
+	function continueSession(obj) {
+		// Replace StoppedSession component with Session component
+		// Fill Session with current position
+		// Fill Session with last obj path interval time
+
 	}
 	return (
 		<View style={styles.container}>
@@ -83,10 +105,6 @@ export default function Journey({ navigation, route }) {
 			</MapView>
 			<Text style={styles.paragraph}>{text}</Text>
 			<StopwatchContainer/>
-			
-			{/* <Text style={styles.title}>
-        {route.params.item.name}
-      </Text> */}
 			<StatusBar style='auto' />
 		</View>
 	);
