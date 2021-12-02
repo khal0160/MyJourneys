@@ -4,7 +4,8 @@ import { StyleSheet, Text, View, Pressable } from 'react-native'
 export default function StopwatchContainer () {
   const [state, setState] = useState({ min: 0, sec: 0, msec: 0, start: false })
   function handleToggle () {
-    setState(!state)
+    setState({start : !state.start})
+    console.log(state)
     handleStart()
   }
   function handleStart () {
@@ -48,10 +49,7 @@ const styles = StyleSheet.create({
   parent: {
     display: 'flex',
     flexDirection: 'row',
-    borderWidth: 1,
     borderRadius: 80,
-    borderColor: '#694966',
-    backgroundColor: '#694966',
     paddingLeft: '8%',
     paddingRight: '8%',
     paddingTop: '.5%',
@@ -60,7 +58,7 @@ const styles = StyleSheet.create({
 
   child: {
     fontSize: 40,
-    color: '#C89933'
+    color: 'black'
   },
 
   buttonParent: {
@@ -71,21 +69,22 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#694966',
     paddingTop: '5%',
     paddingBottom: '5%',
     paddingLeft: '5%',
     paddingRight: '5%',
     display: 'flex',
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#694966',
     height: 60
   },
 
   buttonText: {
-    color: '#C89933',
+    color: 'black',
     fontSize: 20,
     alignSelf: 'center'
+  },
+  
+  container:{
+    paddingTop: 40
   }
 })

@@ -9,6 +9,8 @@ import Constants from "expo-constants";
 
 import * as Location from "expo-location";
 
+import StopwatchContainer from '../components/StopwatchContainer'
+
 export default function Journey({ navigation, route }) {
 	const [location, setLocation] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
@@ -80,11 +82,8 @@ export default function Journey({ navigation, route }) {
 				/>
 			</MapView>
 			<Text style={styles.paragraph}>{text}</Text>
-			<Text style={styles.title}>00:00:00</Text>
-			<Button
-				title={sessionStarted ? "Stop" : "Start"}
-				onPress={() => startSession()}
-			/>
+			<StopwatchContainer/>
+			
 			{/* <Text style={styles.title}>
         {route.params.item.name}
       </Text> */}
