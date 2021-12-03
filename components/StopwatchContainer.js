@@ -1,50 +1,49 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 
 export default function StopwatchContainer () {
-  const [state, setState] = useState({ min: 0, sec: 0, msec: 0, start: false })
-  function handleToggle () {
-    setState({start : !state.start})
-    console.log(state)
-    handleStart()
-  }
-  function handleStart () {
-    if (state.msec !== 99) {
-      setState({
-        msec: state.msec + 1
-      })
-    } else if (state.sec !== 59) {
-      setState({
-        msec: 0,
-        sec: ++state.sec
-      })
-    } else {
-      setState({
-        msec: 0,
-        sec: 0,
-        min: ++state.min
-      })
+  const [time, setTime] = useState(0)
+  const [timerOn, setTimerOn] = useState(false)
+
+  useEffect(() => {
+    let interval = null
+    if (timerOn) {
+      interval = setInterval(() => {
+        setTime(prevTime => prevTime + 10)
+      }, 10)
+    } else if (!timerOn) {
+      clearInterval(interval)
     }
+    return () => clearInterval(interval)
+  }, [timerOn])
+
+  function handleToggle () {
+    setTimerOn(!timerOn)
   }
-  let padToTwo = number => (number <= 9 ? `0${number}` : number)
+
   return (
     <View style={styles.container}>
       <View style={styles.parent}>
-        <Text style={styles.child}>{padToTwo(state.min) + ' : '}</Text>
-        <Text style={styles.child}>{padToTwo(state.sec) + ' : '}</Text>
-        <Text style={styles.child}>{padToTwo(state.msec)}</Text>
+        <Text style={styles.child}>
+          {('0' + Math.floor((time / 60000) % 60)).slice(-2)}:
+        </Text>
+        <Text style={styles.child}>
+          {('0' + Math.floor((time / 1000) % 60)).slice(-2)}:
+        </Text>
+        <Text style={styles.child}>
+          {('0' + ((time / 10) % 100)).slice(-2)}
+        </Text>
       </View>
 
       <View style={styles.buttonParent}>
         <Pressable style={styles.button} onPress={handleToggle}>
-          <Text style={styles.buttonText}>
-            {!state.start ? 'Start' : 'Stop'}
-          </Text>
+          <Text style={styles.buttonText}>{!timerOn ? 'Start' : 'Stop'}</Text>
         </Pressable>
       </View>
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   parent: {
     display: 'flex',
@@ -83,8 +82,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     alignSelf: 'center'
   },
-  
-  container:{
+
+  container: {
     paddingTop: 40
   }
 })
