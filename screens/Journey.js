@@ -23,6 +23,10 @@ export default function Journey ({ navigation, route }) {
   const [sessionStarted, setSessionStarted] = useState(false)
   const [polylineCoords, setPolylineCoords] = useState([]);
 
+  useEffect(() => {
+		console.log(polylineCoords);
+	}, [polylineCoords]);
+
 	async function getPosition() {
 		let locationCoords = await Location.getCurrentPositionAsync({
 			accuracy: 5,
@@ -42,13 +46,8 @@ export default function Journey ({ navigation, route }) {
 			latitude: locationCoords.coords.latitude,
     };
 
-    let newArray = [...polylineCoords];
-		newArray.push(locationPath);
-    setPolylineCoords(newArray);
     console.log(locationPath)
-    console.log(polylineCoords)
-    
-    // setPolylineCoords(polylineCoords => [...polylineCoords, locationPath]);
+    setPolylineCoords(polylineCoords => [...polylineCoords, locationPath])
 
 	}
   useEffect(() => {
