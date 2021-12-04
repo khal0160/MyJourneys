@@ -12,26 +12,45 @@ import StopwatchContainer from '../components/StopwatchContainer'
 import { Polyline } from 'react-native-maps'
 
 export default function Journey ({ navigation, route }) {
-  const [location, setLocation] = useState(null)
-  const [errorMsg, setErrorMsg] = useState(null)
-  const [sessionStarted, setSessionStarted] = useState(false)
   const tokyoRegion = {
     latitude: 35.6762,
     longitude: 139.6503,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01
   }
-  const chibaRegion = {
-    latitude: 35.6074,
-    longitude: 140.1065,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01
-  }
-  const journeyIntervals = {
-	  
-  }
-  
+  const [location, setLocation] = useState(tokyoRegion)
+  const [errorMsg, setErrorMsg] = useState(null)
+  const [sessionStarted, setSessionStarted] = useState(false)
+  const [polylineCoords, setPolylineCoords] = useState([]);
 
+	async function getPosition() {
+		let locationCoords = await Location.getCurrentPositionAsync({
+			accuracy: 5,
+		});
+
+		let locationObj = {
+			longitude: locationCoords.coords.longitude,
+			latitude: locationCoords.coords.latitude,
+			latitudeDelta: 0.0922,
+			longitudeDelta: 0.0421,
+		};
+
+		setLocation(locationObj);
+
+		let locationPath = {
+			longitude: locationCoords.coords.longitude,
+			latitude: locationCoords.coords.latitude,
+    };
+
+    let newArray = [...polylineCoords];
+		newArray.push(locationPath);
+    setPolylineCoords(newArray);
+    console.log(locationPath)
+    console.log(polylineCoords)
+    
+    // setPolylineCoords(polylineCoords => [...polylineCoords, locationPath]);
+
+	}
   useEffect(() => {
     ;(async () => {
       if (Platform.OS === 'android' && !Constants.isDevice) {
@@ -45,25 +64,7 @@ export default function Journey ({ navigation, route }) {
         setErrorMsg('Permission to access location was denied')
         return
       } else {
-        await Location.watchPositionAsync(
-          {
-            accuracy: 5,
-            distanceInterval: 10
-          },
-          locationObj => {
-            const { coords } = locationObj
-
-            let location = new Object({
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421
-            })
-
-            console.log(location)
-            setLocation(location)
-          }
-        )
+        setInterval(() => getPosition(), 3000)
       }
     })()
   }, [])
@@ -77,8 +78,7 @@ export default function Journey ({ navigation, route }) {
   function startSession (obj) {
     setSessionStarted(!sessionStarted)
     // Replace Session component with StartedSession component
-	// If obj is empty , create one
-	
+    // If obj is empty , create one
     // Session Object { path : [ interval 1, interval2]}
     // interval i : { currentTime : {}, currentLat, currentLon}
     // Start Timer in StopWatchContainer
@@ -90,33 +90,43 @@ export default function Journey ({ navigation, route }) {
     // push the object into the path array
     // Object.path.push(interval)
   }
+
   function stopSession (obj) {
     // Break the 3 second loop in obj
     // Replace StartedSession component with StoppedSession component
   }
+
   function continueSession (obj) {
     // Replace StoppedSession component with Session component
     // Fill Session with current position
     // Fill Session with last obj path interval time
   }
+
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={tokyoRegion}>
-		{
-		/* region={location && location}
-		<Marker
-          coordinate={{
-            latitude: location ? location.latitude : 37.78825,
-            longitude: location ? location.longitude : -122.43
-          }}
-        /> */}
-        <Polyline
-          coordinates={[tokyoRegion, chibaRegion]} //specify our coordinates
-          strokeColor={'#000'}
-          strokeWidth={3}
-          lineDashPattern={[1]}
-        />
-      </MapView>
+      <MapView
+				style={styles.map}
+				//specify our coordinates.
+				// initialRegion={{
+				// 	latitude: 37.78825,
+				// 	longitude: -122.4324,
+				// 	latitudeDelta: 0.0922,
+				// 	longitudeDelta: 0.0421,
+				// }}
+				region={location && location}
+			>
+				<Marker
+					coordinate={{
+						latitude: location ? location.latitude : 37.78825,
+						longitude: location ? location.longitude : -122.43,
+					}}
+				/>
+				<Polyline
+					coordinates={polylineCoords && polylineCoords}
+					strokeWidth={styles.polyline.width}
+					strokeColor={styles.polyline.color}
+				/>
+			</MapView>
       <Text style={styles.paragraph}>{text}</Text>
       <StopwatchContainer />
       <StatusBar style='auto' />
@@ -144,5 +154,9 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 18,
     textAlign: 'center'
-  }
+  },
+  polyline: {
+		width: 2,
+		color: "#1c5469",
+	},
 })
