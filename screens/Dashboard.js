@@ -13,24 +13,32 @@ import {
 import { useJourneys } from "../context/JourneysContext";
 
 export default function Dashboard({ navigation, route }) {
-	const { journeys } = useJourneys();
+	const { journeys, setReadySession, setCurrentJourney } = useJourneys();
 
-	// useEffect(() => {
+	function goToReadySession() {
+		setReadySession(true);
+		navigation.navigate("Journey");
+	}
 
-	// }, [])
-
-	function goToJourney(obj) {
-		console.log(obj);
-		navigation.navigate("Journey", { journey: { obj } });
+	function goToInfoSession() {
+		console.log("goToInfo Called");
+		setReadySession(false);
+		navigation.navigate("Journey");
 	}
 
 	function JourneyObj({ journey }) {
 		console.log(journey);
 		return (
-			<View style={styles.row}>
+			<Pressable
+				style={styles.row}
+				onPress={() => {
+					setCurrentJourney(journey);
+					goToInfoSession();
+				}}
+			>
 				<Text>{journey.item.id}</Text>
 				<Text>{journey.item.time}</Text>
-			</View>
+			</Pressable>
 		);
 	}
 
@@ -44,13 +52,13 @@ export default function Dashboard({ navigation, route }) {
 				// 	setIsRefreshing(true);
 				// 	getData();
 				// }}
-				ListEmptyComponent={<Text>Sorry! No Journeys to display :( </Text>}
+				ListEmptyComponent={<Text>Sorry! No Journeys to display : </Text>}
 			/>
 			<FAB
 				visible={true}
 				icon={{ name: "add", color: "white" }}
 				onPress={() => {
-					goToJourney();
+					goToReadySession();
 				}}
 				style={styles.fab}
 			/>

@@ -2,16 +2,18 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 
 import { useJourneys } from "../context/JourneysContext";
+import timeFormatter from "../utils/utils";
 
 export default function StopwatchContainer({
 	timerOn,
 	setTimerOn,
-	location,
+	savedTime,
 	polylineCoords,
+	navFunc,
 }) {
-	const [time, setTime] = useState(0);
+	const [time, setTime] = useState(readySession && readySession? savedTime : 0);
 
-	const { saveNewJourneysObj, journeys } = useJourneys();
+	const { saveNewJourneysObj, readySession } = useJourneys();
 
 	useEffect(() => {
 		let interval = null;
@@ -29,24 +31,16 @@ export default function StopwatchContainer({
 		setTimerOn(!timerOn);
 	}
 
-	function saveJourney() {
-		saveNewJourneysObj(time, polylineCoords);
+	async function saveJourney() {
+		await saveNewJourneysObj(time, polylineCoords);
+		navFunc();
 	}
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.parent}>
-				<Text style={styles.child}>
-					{("0" + Math.floor((time / 60000) % 60)).slice(-2)}:
-				</Text>
-				<Text style={styles.child}>
-					{("0" + Math.floor((time / 1000) % 60)).slice(-2)}:
-				</Text>
-				<Text style={styles.child}>
-					{("0" + ((time / 10) % 100)).slice(-2)}
-				</Text>
+				<Text style={styles.child}>{timeFormatter(readySession? savedTime : time)}</Text>
 			</View>
-
 			<View style={styles.buttonParent}>
 				<Pressable style={styles.button} onPress={handleToggle}>
 					<Text style={styles.buttonText}>{!timerOn ? "Start" : "Stop"}</Text>
