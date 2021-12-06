@@ -10,13 +10,16 @@ import {
 	Pressable,
 } from "react-native";
 
-import { useJourneys } from "../context/JourneysContext";
+import cuid from "cuid";
 
+import { useJourneys } from "../context/JourneysContext";
+import timeFormatter from "../utils/utils";
 export default function Dashboard({ navigation, route }) {
 	const { journeys, setReadySession, setCurrentJourney } = useJourneys();
 
 	function goToReadySession() {
 		setReadySession(true);
+		setCurrentJourney({});
 		navigation.navigate("Journey");
 	}
 
@@ -36,8 +39,11 @@ export default function Dashboard({ navigation, route }) {
 					goToInfoSession();
 				}}
 			>
-				<Text>{journey.item.id}</Text>
-				<Text>{journey.item.time}</Text>
+				<Text style={styles.text}>Journey</Text>
+				<Text style={styles.text}>ID : {journey.item.id}</Text>
+				<Text style={styles.text}>
+					Time : {timeFormatter(journey.item.time)}{" "}
+				</Text>
 			</Pressable>
 		);
 	}
@@ -47,6 +53,7 @@ export default function Dashboard({ navigation, route }) {
 			<FlatList
 				data={journeys}
 				renderItem={item => <JourneyObj journey={item} />}
+				keyExtractor={_ => cuid()}
 				// refreshing={isRefreshing}
 				// onRefresh={() => {
 				// 	setIsRefreshing(true);
@@ -72,16 +79,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#fff",
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "flex-start",
 		width: "100%",
 	},
 	row: {
 		margin: 20,
 		backgroundColor: "beige",
-		height: 50,
+		height: 100,
 		justifyContent: "center",
-		alignItems: "center",
+		alignItems: "flex-start",
 		width: 300,
+		paddingHorizontal: 10,
+		borderRadius: 20,
+		paddingLeft: 30,
 	},
 	fab: {
 		width: "100%",
@@ -89,4 +99,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: "9%",
 		paddingTop: "3%",
 	},
+
+	text: {
+		paddingVertical: 4,
+	},
 });
+
