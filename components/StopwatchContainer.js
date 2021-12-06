@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 
+
 import { useJourneys } from "../context/JourneysContext";
 import timeFormatter from "../utils/utils";
 
@@ -10,16 +11,22 @@ export default function StopwatchContainer({
 	savedTime,
 	polylineCoords,
 	navFunc,
+	isCurrentJourneyEmpty,
 }) {
-	const [time, setTime] = useState(readySession && readySession? savedTime : 0);
+	const [time, setTime] = useState(0);
 
-	const { saveNewJourneysObj, readySession } = useJourneys();
+	const { saveNewJourneysObj, readySession, editJourneysObj, currentJourney } =
+		useJourneys();
+
+	useEffect(() => {
+		savedTime && setTime(savedTime);
+	}, []);
 
 	useEffect(() => {
 		let interval = null;
 		if (timerOn) {
 			interval = setInterval(() => {
-				setTime(prevTime => prevTime + 10);
+				setTime(x => x + 10);
 			}, 10);
 		} else if (!timerOn) {
 			clearInterval(interval);
@@ -32,21 +39,39 @@ export default function StopwatchContainer({
 	}
 
 	async function saveJourney() {
+		// if currentJournehy is empty
+		// create a new one
+		// else, update currentJourney with new data on Stop
 		await saveNewJourneysObj(time, polylineCoords);
+		navFunc();
+	}
+	let editObject = {
+		time: time,
+		locationArray: polylineCoords,
+	};
+	async function editJourney(id, obj) {
+		await editJourneysObj(id, obj);
 		navFunc();
 	}
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.parent}>
-				<Text style={styles.child}>{timeFormatter(readySession? savedTime : time)}</Text>
+				<Text style={styles.child}>{timeFormatter(time)}</Text>
 			</View>
 			<View style={styles.buttonParent}>
 				<Pressable style={styles.button} onPress={handleToggle}>
 					<Text style={styles.buttonText}>{!timerOn ? "Start" : "Stop"}</Text>
 				</Pressable>
 				{!timerOn && (
-					<Pressable style={styles.button} onPress={saveJourney}>
+					<Pressable
+						style={styles.button}
+						onPress={() =>
+							!isCurrentJourneyEmpty
+								? editJourney(currentJourney.item.id, editObject)
+								: saveJourney()
+						}
+					>
 						<Text style={styles.buttonText}>Save Journey</Text>
 					</Pressable>
 				)}

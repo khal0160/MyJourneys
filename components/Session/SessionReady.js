@@ -10,10 +10,7 @@ import { StatusBar } from "expo-status-bar";
 
 import * as Location from "expo-location";
 
-
 export default function SessionReady(props) {
-
-  
 	const tokyoRegion = {
 		latitude: 35.6762,
 		longitude: 139.6503,
@@ -23,14 +20,13 @@ export default function SessionReady(props) {
 
 	const [location, setLocation] = useState(tokyoRegion);
 	const [timerOn, setTimerOn] = useState(false);
-  const [polylineCoords, setPolylineCoords] = useState([]);
-  
-  const { readySession, currentJourney } = useJourneys();
-  const { item } = currentJourney;
-  
-	useEffect(() => {
-		console.log(polylineCoords, polylineCoords.length);
-	}, [polylineCoords]);
+	const [polylineCoords, setPolylineCoords] = useState([]);
+
+	const { readySession, currentJourney } = useJourneys();
+
+	const isCurrentJourneyEmpty = Object.values(currentJourney) >= 0;
+
+	// console.log(isCurrentJourneyEmpty);
 
 	useEffect(() => {
 		let interval;
@@ -47,6 +43,33 @@ export default function SessionReady(props) {
 	useEffect(() => {
 		getPosition();
 	}, []);
+
+	useEffect(() => {
+		!isCurrentJourneyEmpty &&
+			setPolylineCoords(currentJourney.item.locationArray);
+	}, []);
+
+	useEffect(() => {
+		(async () => {
+			if (Platform.OS === "android" && !Constants.isDevice) {
+				setErrorMsg(
+					"Oops, this will not work on Snack in an Android emulator. Try it on your device!"
+				);
+				return;
+			}
+			let { status } = await Location.requestForegroundPermissionsAsync();
+			if (status !== "granted") {
+				setErrorMsg("Permission to access location was denied");
+				return;
+			} else {
+				getPosition();
+			}
+		})();
+	}, []);
+
+	useEffect(() => {
+		console.log("this is the current journey", currentJourney);
+	}, [currentJourney]);
 
 	async function getPosition() {
 		let locationCoords = await Location.getCurrentPositionAsync({
@@ -67,47 +90,38 @@ export default function SessionReady(props) {
 			latitude: locationCoords.coords.latitude,
 		};
 
-		console.log(locationPath);
+		// console.log(locationPath);
 		setPolylineCoords(polylineCoords => [...polylineCoords, locationPath]);
 	}
 
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS === "android" && !Constants.isDevice) {
-				setErrorMsg(
-					"Oops, this will not work on Snack in an Android emulator. Try it on your device!"
-				);
-				return;
-			}
-			let { status } = await Location.requestForegroundPermissionsAsync();
-			if (status !== "granted") {
-				setErrorMsg("Permission to access location was denied");
-				return;
-			} else {
-				getPosition();
-			}
-		})();
-  }, []);
-  const coordsForMap = {
-		latitude: item.locationArray[item.locationArray.length - 1].latitude,
-		longitude: item.locationArray[item.locationArray.length - 1].longitude,
-		latitudeDelta: 0.0922,
-		longitudeDelta: 0.0421,
-	};
+	let coordsForMap;
+	if (!isCurrentJourneyEmpty) {
+		coordsForMap = {
+			latitude:
+				currentJourney.item.locationArray[
+					currentJourney.item.locationArray.length - 1
+				].latitude,
+			longitude:
+				currentJourney.item.locationArray[
+					currentJourney.item.locationArray.length - 1
+				].longitude,
+			latitudeDelta: 0.0922,
+			longitudeDelta: 0.0421,
+		};
+	}
+
 	return (
-    
 		<View style={styles.container}>
-      
-			<MapView style={styles.map} region={ readySession? coordsForMap : 
-        location && location}>
-				<Marker
-					coordinate={{
-						latitude: location ? location.latitude : 37.78825,
-						longitude: location ? location.longitude : -122.43,
-					}}
-				/>
+			<MapView
+				style={styles.map}
+				region={!isCurrentJourneyEmpty ? coordsForMap : location}
+			>
 				<Polyline
-					coordinates={polylineCoords && polylineCoords}
+					coordinates={
+						!isCurrentJourneyEmpty
+							? currentJourney.item.locationArray
+							: polylineCoords && polylineCoords
+					}
 					strokeWidth={styles.polyline.width}
 					strokeColor={styles.polyline.color}
 				/>
@@ -115,15 +129,17 @@ export default function SessionReady(props) {
 			<StopwatchContainer
 				timerOn={timerOn}
 				setTimerOn={setTimerOn}
-				location={readySession? coordsForMap: location}
+				location={!isCurrentJourneyEmpty ? coordsForMap : location}
 				polylineCoords={polylineCoords}
-        navFunc={props.navFunc}
-        savedTime={item.time}
+				navFunc={props.navFunc}
+				savedTime={!isCurrentJourneyEmpty && currentJourney.item.time}
+				isCurrentJourneyEmpty={isCurrentJourneyEmpty}
 			/>
 			<StatusBar style='auto' />
 		</View>
 	);
 }
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,

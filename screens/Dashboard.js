@@ -40,7 +40,7 @@ export default function Dashboard({ navigation, route }) {
 				}}
 			>
 				<Text style={styles.text}>Journey</Text>
-				<Text style={styles.text}>ID : {journey.item.id}</Text>
+				
 				<Text style={styles.text}>
 					Time : {timeFormatter(journey.item.time)}{" "}
 				</Text>
