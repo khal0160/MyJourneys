@@ -59,7 +59,7 @@ export default function Dashboard({ navigation, route }) {
 				// 	setIsRefreshing(true);
 				// 	getData();
 				// }}
-				ListEmptyComponent={<Text>Sorry! No Journeys to display : </Text>}
+				ListEmptyComponent={<Text style={styles.noTextTitle}>Sorry! No Journeys to display : </Text>}
 			/>
 			<FAB
 				visible={true}
@@ -103,5 +103,8 @@ const styles = StyleSheet.create({
 	text: {
 		paddingVertical: 4,
 	},
+	noTextTitle: {
+		paddingVertical: 100
+	}
 });
 
